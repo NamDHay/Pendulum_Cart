@@ -2,38 +2,39 @@
 /plugin/;
 / {
 	compatible = "brcm,bcm2835";
-
 	chosen {
 		bootargs = "console=serial0,115200";
 	};
 
-	aliases {
-		uart0 = &uart0;
-		i2c0 = &i2c0;
-		pwm0 = &pwm0;
-		gpio = &gpio;
-	};
+	fragment@0 {
+		aliases {
+			uart0 = &uart0;
+			i2c0 = &i2c0;
+			pwm0 = &pwm0;
+		};
 
-	soc {
+		soc {
 #address-cells = <1>;
 #size-cells = <1>;
-
-uart0 : serial@7e201000 {
-		compatible = "brcm,bcm2835-aux-uart";
-		reg = <0x7e201000 0x1000>;
-		interrupts = <0x1>;
-	};
+uart0: serial@7e201000 {
+	       compatible = "brcm,bcm2835-aux-uart";
+	       reg = <0x7e201000 0x1000>;
+	       interrupts = <0x1>;
+	       interrupt-parent = <&gpio>;
+       };
 
 i2c0: i2c@7e205000 {
 	      compatible = "brcm,bcm2835-i2c";
+#address-cells = <1>;
+#size-cells = <0>;
 	      reg = <0x7e205000 0x1000>;
 	      interrupts = <0x1>;
 	      clock-frequency = <100000>;
-
+	      interrupt-parent = <&gpio>;
 mpu6050: mpu6050@68 {
 		 compatible = "inven,mpu6050";
+		 reg = <0x68>;
 		 status = "okay";
-		 reg = 0x68;
 		 interrupt-parent = <&gpio>;
 		 interrupts = <25>;  // GPIO pin for MPU6050 interrupt
 	 };
@@ -42,37 +43,39 @@ mpu6050: mpu6050@68 {
 pwm0: pwm@7e20c000 {
 	      compatible = "brcm,bcm2835-pwm";
 	      reg = <0x7e20c000 0x1000>;
+#pwm-cells = <2>;
 
-motor1_pwm1: motor_pwm@0 {
-		     label = "Motor1 Channel 1";
-		     pwm-channel = <0>;
+motor1_pwm1: motor1_pwm1 {
+		     pwm-names = "motor1-channel-1";
+		     pwm-channel = <&pwm 0 5000000>;
 	     };
-motor1_pwm2: motor_pwm@1 {
-		     label = "Motor1 Channel 2";
-		     pwm-channel = <1>;
+motor1_pwm2: motor1_pwm2 {
+		     pwm-names = "motor1-channel-2";
+		     pwm-channel = <&pwm 1 5000000>;
 	     };
-motor2_pwm1: motor_pwm@2 {
-		     label = "Motor2 Channel 1";
-		     pwm-channel = <2>;
+motor2_pwm1: motor2_pwm1 {
+		     pwm-names = "motor2-channel-1";
+		     pwm-channel = <&pwm 2 5000000>;
 	     };
-motor2_pwm2: motor_pwm@3 {
-		     label = "Motor2 Channel 2";
-		     pwm-channel = <3>;
+motor2_pwm2: motor2_pwm2 {
+		     pwm-names = "motor2-channel-2";
+		     pwm-channel = <&pwm 3 5000000>;
 	     };
       };
 
-encoder1: encoder@0 {
+encoder1: encoder1 {
 		  compatible = "rotary-encoder-driver";
 		  gpios = <&gpio 5 0>, <&gpio 6 0>;
 		  label = "Rotary Encoder 1";
 		  linux,default-trigger = "both";
 	  };
 
-encoder2: encoder@1 {
+encoder2: encoder2 {
 		  compatible = "rotary-encoder-driver";
 		  gpios = <&gpio 7 0>, <&gpio 8 0>;
 		  label = "Rotary Encoder 2";
 		  linux,default-trigger = "both";
 	  };
+		};
 	};
 };
