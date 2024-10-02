@@ -31,7 +31,7 @@ i2c0: i2c@7e205000 {
 	      clock-frequency = <100000>;
 
 mpu6050: mpu6050@68 {
-		 compatible = "accelerometer";
+		 compatible = "inven,mpu6050";
 		 status = "okay";
 		 reg = 0x68;
 		 interrupt-parent = <&gpio>;
