@@ -1,32 +1,32 @@
-/dts-v1/;
+/dts-v2/;
 /plugin/;
 / {
-	compatible = "brcm,bcm2835";
+	compatible = "brcm,bcm2836";
 	chosen {
 		bootargs = "console=serial0,115200";
 	};
 
 	fragment@0 {
-		aliases {
-			uart0 = &uart0;
-			i2c0 = &i2c0;
-			pwm0 = &pwm0;
-		};
-
-		soc {
+		target = <&uart0>;
+		__overlay__ {
 #address-cells = <1>;
-#size-cells = <1>;
+#size-cells = <0>;
 uart0: serial@7e201000 {
 	       compatible = "brcm,bcm2835-aux-uart";
 	       reg = <0x7e201000 0x1000>;
 	       interrupts = <0x1>;
 	       interrupt-parent = <&gpio>;
        };
+		};
+	};
 
-i2c0: i2c@7e205000 {
-	      compatible = "brcm,bcm2835-i2c";
+	fragment@1 {
+		target = <&i2c0>;
+		__overlay__ {
 #address-cells = <1>;
 #size-cells = <0>;
+i2c0: i2c@7e205000 {
+	      compatible = "brcm,bcm2835-i2c";
 	      reg = <0x7e205000 0x1000>;
 	      interrupts = <0x1>;
 	      clock-frequency = <100000>;
@@ -39,11 +39,16 @@ mpu6050: mpu6050@68 {
 		 interrupts = <25>;  // GPIO pin for MPU6050 interrupt
 	 };
       };
+		};
+	};
 
+	fragment@2 {
+		target = <&pwm0>;
+		__overlay__ {
+#pwm-cells = <2>;
 pwm0: pwm@7e20c000 {
 	      compatible = "brcm,bcm2835-pwm";
 	      reg = <0x7e20c000 0x1000>;
-#pwm-cells = <2>;
 
 motor1_pwm1: motor1_pwm1 {
 		     pwm-names = "motor1-channel-1";
@@ -62,7 +67,10 @@ motor2_pwm2: motor2_pwm2 {
 		     pwm-channel = <&pwm 3 5000000>;
 	     };
       };
-
+		};
+	};
+	fragment@3 {
+		__overlay__ {
 encoder1: encoder1 {
 		  compatible = "rotary-encoder-driver";
 		  gpios = <&gpio 5 0>, <&gpio 6 0>;
